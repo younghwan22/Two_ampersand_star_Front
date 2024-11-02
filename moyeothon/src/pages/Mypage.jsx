@@ -3,6 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { FaRegPenToSquare } from "react-icons/fa6";
 import axios from "axios";
 
+// axios 인스턴스 생성
+const api = axios.create({
+  baseURL: "https://kyulimcho.shop",
+  withCredentials: true, // CORS 설정 추가
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 function MyPage() {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
@@ -21,27 +30,24 @@ function MyPage() {
           return;
         }
 
-        // API 요청
-        const response = await axios.get(
-          "https://kyulimcho.shop",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        // Authorization 헤더 추가
+        const response = await api.get("/api/users/info", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         // 사용자 정보 설정
         if (response.status === 200) {
           setUserInfo({
-            nickName: response.data.nickName,
-            email: response.data.email, // 이메일 정보가 응답에 포함되어 있지 않아 예제 값으로 설정했습니다
+            nickname: response.data.nickName, // 서버에서 전달되는 데이터의 키를 확인하세요
+            email: response.data.email, // 이메일 키도 맞는지 확인 필요
           });
           console.log(response.data);
         }
       } catch (error) {
         console.error("Error fetching user info:", error);
-        alert("사용자 정보를 불러오는 데 실패했습니다.");
+        alert("사용자 정보 불러오는 데 실패했습니다.");
       }
     };
 
@@ -63,18 +69,12 @@ function MyPage() {
   return (
     <div className="max-w-[480px] mx-auto min-h-screen bg-white px-5 py-6">
       {/* 헤더 */}
-      <h1 className="mb-6 text-2xl font-bold font-family: Pretendard">
-        마이페이지
-      </h1>
+      <h1 className="mb-6 text-2xl font-bold font-family: Pretendard">마이페이지</h1>
 
       {/* 사용자 정보 */}
       <div className="bg-[#ECFFF8] rounded-lg p-5 mb-8 relative">
-        <h2 className="mb-2 text-xl font-family: Pretendard">
-          {userInfo.nickName} 님
-        </h2>
-        <p className="text-sm text-black font-family: Pretendard">
-          {userInfo.email}
-        </p>
+        <h2 className="mb-2 text-xl font-family: Pretendard">{userInfo.nickname} 님</h2>
+        <p className="text-sm text-black font-family: Pretendard">{userInfo.email}</p>
         <button
           className="absolute text-xl -translate-y-1/2 right-5 top-1/2 size-3"
           onClick={() => navigate("/fix")}
@@ -85,9 +85,7 @@ function MyPage() {
 
       {/* 참여 코스 섹션 */}
       <section className="mb-8">
-        <h3 className="mb-4 text-lg font-semibold font-family: Pretendard">
-          내가 참여한 코스
-        </h3>
+        <h3 className="mb-4 text-lg font-semibold font-family: Pretendard">내가 참여한 코스</h3>
         <div className="grid grid-cols-3 gap-4 mb-6 justify-items-center font-family: Pretendard">
           {[
             "캠퍼스 러닝 코스",
@@ -102,9 +100,7 @@ function MyPage() {
               className="flex flex-col items-center p-3 rounded-lg font-family: Pretendard"
             >
               <div className="bg-gray-300 w-[120px] h-[120px] rounded-md mb-2 font-family: Pretendard"></div>
-              <p className="text-sm text-center font-family: Pretendard">
-                {text}
-              </p>
+              <p className="text-sm text-center font-family: Pretendard">{text}</p>
             </div>
           ))}
         </div>
@@ -133,9 +129,7 @@ function MyPage() {
               key={page}
               onClick={() => setCurrentPage(page)}
               className={`w-8 h-8 rounded ${
-                page === currentPage
-                  ? "bg-[#B4FFE3] text-[#48CBC8]"
-                  : "text-[#D1D5D7]"
+                page === currentPage ? "bg-[#B4FFE3] text-[#48CBC8]" : "text-[#D1D5D7]"
               }`}
             >
               {page}
@@ -163,12 +157,10 @@ function MyPage() {
 
       {/* 메뉴 섹션 */}
       <div className="mt-10">
-        <div className="py-4 text-lg font-semibold font-family: Pretendard">
-          문의
-        </div>
+        <div className="py-4 text-lg font-semibold font-family: Pretendard">문의</div>
         <div
           className="py-4 text-lg font-semibold font-family: Pretendard cursor-pointer hover:text-[#48CBC8]"
-          onClick={handleLogout} // 클릭 핸들러 추가
+          onClick={handleLogout}
         >
           로그아웃
         </div>

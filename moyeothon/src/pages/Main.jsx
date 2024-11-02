@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import axios from "axios";
 import MainContainer from "../components/MainContainer";
 
 const LogoContainer = styled.div`
-  display: flex; /* 플렉스 박스를 사용하여 정렬 */
-  justify-content: center; /* Logo를 수평 가운데 정렬 */
+  display: flex;
+  justify-content: center;
   align-items: center;
 `;
 
@@ -126,6 +127,43 @@ const Main = () => {
     setCurrentPage(page);
   };
 
+  const [location, setLocation] = useState(null);
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [title, setTitle] = useState("");
+  const [district, setDistrict] = useState("");
+  const [speed, setSpeed] = useState("");
+  const [pathData, setPathData] = useState("");
+
+  useEffect(() => {
+    // 사용자의 현재 위치.
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        setLocation({ latitude, longitude });
+      });
+    }
+
+    // 예정된 러닝 정보.
+    const token = "Bearer token";
+
+    axios
+      .get("/api/schedule", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        const data = response.data;
+        setDate(data.date);
+        setTime(data.time);
+        setTitle(data.title);
+        setDistrict(data.district);
+        setSpeed(data.speed);
+        setPathData(data.pathData);
+      });
+  }, []);
+
   return (
     <MainContainer>
       <LogoContainer>
@@ -136,22 +174,43 @@ const Main = () => {
       <SectionTitle>예정된 러닝</SectionTitle>
       <RunningCard>
         <RunningInfo>
-          <span>24.10.28 / 20:00</span>
-          <RunningTitle>중랑천 만보런</RunningTitle>
+          <span>
+            {date}/{time}
+          </span>
+          <RunningTitle>{title}</RunningTitle>
           <BadgeContainer>
-            <Badge>서울</Badge>
-            <Badge>빠르게</Badge>
+            <Badge>{district}</Badge>
+            <Badge>{speed}</Badge>
           </BadgeContainer>
         </RunningInfo>
-        <img
-          src="../../img/ex_map.png"
-          alt="러닝 지도"
-          style={{ width: "150px", height: "100px", borderRadius: "8px" }}
-        />
+        <div>
+          {pathData ? (
+            <div>
+              <h3>현재 위치 데이터:</h3>
+              <p>{pathData}</p>
+            </div>
+          ) : (
+            <p>위치 정보를 불러오는 중...</p>
+          )}
+        </div>
       </RunningCard>
 
       <SectionTitle>내 현재 위치</SectionTitle>
-      <MapContainer>사용자 현재 위치</MapContainer>
+      <MapContainer>
+        {location ? (
+          <div>
+            <h4>현재 위치</h4>
+            <p>
+              <strong>위도:</strong> {location.latitude}
+            </p>
+            <p>
+              <strong>경도:</strong> {location.longitude}
+            </p>
+          </div>
+        ) : (
+          <p>위치 정보를 불러오는 중...</p>
+        )}
+      </MapContainer>
 
       <SectionTitle>내 주변 코스</SectionTitle>
       <CourseContainer>

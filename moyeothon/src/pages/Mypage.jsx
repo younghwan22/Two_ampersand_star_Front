@@ -23,7 +23,7 @@ function MyPage() {
 
         // API 요청
         const response = await axios.get(
-          "http://3.38.168.166:8080/api/users/info",
+          "https://kyulimcho.shop",
           {
             headers: {
               Authorization: `Bearer ${token}`,

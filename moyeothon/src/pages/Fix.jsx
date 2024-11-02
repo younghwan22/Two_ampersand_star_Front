@@ -30,7 +30,7 @@ function Fix() {
     const fetchUserInfo = async () => {
       try {
         const response = await fetch(
-          "http://3.38.168.166:8080/api/users/info",
+          "https://kyulimcho.shop",
           {
             headers: {
               Authorization: `Bearer ${token}`,

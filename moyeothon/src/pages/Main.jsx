@@ -68,14 +68,11 @@ const Badge = styled.span`
 `;
 
 const MapContainer = styled.div`
-  background-color: #f3f3f3;
+  width: 100%;
   height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  color: #888;
+  display: ${(props) => (props.visible ? "block" : "none")};
   margin-top: 10px;
+  border-radius: 8px;
 `;
 
 const CourseContainer = styled.div`
@@ -150,6 +147,7 @@ const Main = () => {
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
         setLocation({ latitude, longitude });
+        loadKakaoMapScript();
       });
     }
 
@@ -173,7 +171,6 @@ const Main = () => {
       })
       .catch((error) => {
         console.error("Error fetching running schedule:", error);
-        alert("러닝 정보를 불러오는 데 실패했습니다.");
       });
 
     // 주변 코스
@@ -190,6 +187,31 @@ const Main = () => {
         console.error("Error fetching nearby courses:", error);
       });
   }, []);
+
+  const loadKakaoMapScript = () => {
+    if (!window.kakao) {
+      const script = document.createElement("script");
+      script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_APP_KEY";
+      script.async = true;
+      script.onload = () => {
+        if (location) displayMap(location);
+      };
+      document.head.appendChild(script);
+    }
+  };
+
+  const displayMap = ({ latitude, longitude }) => {
+    const mapContainer = document.getElementById("map");
+    const options = {
+      center: new window.kakao.maps.LatLng(latitude, longitude),
+      level: 3,
+    };
+    const map = new window.kakao.maps.Map(mapContainer, options);
+    new window.kakao.maps.Marker({
+      position: new window.kakao.maps.LatLng(latitude, longitude),
+      map: map,
+    });
+  };
 
   return (
     <MainContainer>
@@ -223,20 +245,8 @@ const Main = () => {
       </RunningCard>
 
       <SectionTitle>내 현재 위치</SectionTitle>
-      <MapContainer>
-        {location ? (
-          <div>
-            <h4>현재 위치</h4>
-            <p>
-              <strong>위도:</strong> {location.latitude}
-            </p>
-            <p>
-              <strong>경도:</strong> {location.longitude}
-            </p>
-          </div>
-        ) : (
-          <p>위치 정보를 불러오는 중...</p>
-        )}
+      <MapContainer id="map" visible={!!location}>
+        {!location && <p>위치 정보를 불러오는 중...</p>}
       </MapContainer>
 
       <SectionTitle>내 주변 코스</SectionTitle>

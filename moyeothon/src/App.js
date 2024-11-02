@@ -16,7 +16,7 @@ import Running from "./pages/Running";
 import axios from "axios";
 
 // API 기본 설정
-axios.defaults.baseURL = "http://3.38.168.166:8080";
+axios.defaults.baseURL = "https://kyulimcho.shop";
 axios.defaults.headers.common["Content-Type"] = "application/json";
 
 function App() {

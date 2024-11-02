@@ -6,6 +6,7 @@ import axios from "axios";
 // axios 인스턴스 생성
 const api = axios.create({
   baseURL: "https://kyulimcho.shop",
+  withCredentials: true, // CORS 설정 추가
   headers: {
     "Content-Type": "application/json",
   },
@@ -30,7 +31,7 @@ function MyPage() {
         }
 
         // Authorization 헤더 추가
-        const response = await api.get("/api/info", {
+        const response = await api.get("/api/users/info", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -46,7 +47,7 @@ function MyPage() {
         }
       } catch (error) {
         console.error("Error fetching user info:", error);
-        alert("사용자 정보를 불러오는 데 실패했습니다.");
+        alert("사용자 정보 불러오는 데 실패했습니다.");
       }
     };
 

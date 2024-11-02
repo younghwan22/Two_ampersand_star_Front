@@ -77,22 +77,22 @@ function Fix() {
         password: formData.password,
       });
 
-      // // 먼저 토큰 유효성 검증
-      // const checkResponse = await fetch('http://3.38.168.166:8080/api/users/info', {
-      //   headers: {
-      //     'Authorization': `Bearer ${token}`
-      //   }
-      // });
+      // 먼저 토큰 유효성 검증
+      const checkResponse = await fetch('https://kyulimcho.shop/api/users/info', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-      // if (checkResponse.status === 403) {
-      //   localStorage.removeItem('token');
-      //   alert('로그인이 필요합니다.');
-      //   navigate('/login');
-      //   return;
-      // }
+      if (checkResponse.status === 403) {
+        localStorage.removeItem('token');
+        alert('로그인이 필요합니다.');
+        navigate('/login');
+        return;
+      }
 
       // 정보 업데이트 요청
-      const response = await fetch("http://3.38.168.166:8080/api/users/info", {
+      const response = await fetch("https://kyulimcho.shop/api/users/info", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,

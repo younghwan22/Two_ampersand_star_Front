@@ -1,3 +1,4 @@
+// Main.jsx
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
@@ -142,9 +143,10 @@ const Main = () => {
   const [district, setDistrict] = useState("");
   const [speed, setSpeed] = useState("");
   const [pathData, setPathData] = useState("");
+  const [courses, setCourses] = useState([]);
 
   useEffect(() => {
-    // 사용자의 현재 위치.
+    // 사용자 위치
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
@@ -152,11 +154,11 @@ const Main = () => {
       });
     }
 
-    // 예정된 러닝 정보.
     const token = localStorage.getItem("token");
 
+    // 러닝 정보
     api
-      .get("/api/schedule", {
+      .get("/api/mains/schedule", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -173,6 +175,20 @@ const Main = () => {
       .catch((error) => {
         console.error("Error fetching running schedule:", error);
         alert("러닝 정보를 불러오는 데 실패했습니다.");
+      });
+
+    // 주변 코스
+    api
+      .get("/api/mains/routes", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        setCourses(response.data.courses);
+      })
+      .catch((error) => {
+        console.error("Error fetching nearby courses:", error);
       });
   }, []);
 
@@ -202,7 +218,7 @@ const Main = () => {
               <p>{pathData}</p>
             </div>
           ) : (
-            <p>위치 정보를 불러오는 중...</p>
+            <p>예정된 러닝이 없습니다</p>
           )}
         </div>
       </RunningCard>
@@ -226,30 +242,12 @@ const Main = () => {
 
       <SectionTitle>내 주변 코스</SectionTitle>
       <CourseContainer>
-        <CourseCard>
-          <CourseImage />
-          <CourseTitle>캠퍼스 러닝 코스</CourseTitle>
-        </CourseCard>
-        <CourseCard>
-          <CourseImage />
-          <CourseTitle>짧고 굵은 코스</CourseTitle>
-        </CourseCard>
-        <CourseCard>
-          <CourseImage />
-          <CourseTitle>중랑천 만보런</CourseTitle>
-        </CourseCard>
-        <CourseCard>
-          <CourseImage />
-          <CourseTitle>캠퍼스 러닝 코스</CourseTitle>
-        </CourseCard>
-        <CourseCard>
-          <CourseImage />
-          <CourseTitle>짧고 굵은 코스</CourseTitle>
-        </CourseCard>
-        <CourseCard>
-          <CourseImage />
-          <CourseTitle>중랑천 만보런</CourseTitle>
-        </CourseCard>
+        {courses.map((course, index) => (
+          <CourseCard key={index}>
+            <CourseImage />
+            <CourseTitle>{course.title}</CourseTitle>
+          </CourseCard>
+        ))}
       </CourseContainer>
 
       <Pagination>
@@ -262,7 +260,7 @@ const Main = () => {
         {[...Array(totalPages)].map((_, index) => (
           <PaginationButton
             key={index + 1}
-            active={currentPage === index + 1}
+            active={String(currentPage === index + 1)}
             onClick={() => handlePageChange(index + 1)}
           >
             {index + 1}

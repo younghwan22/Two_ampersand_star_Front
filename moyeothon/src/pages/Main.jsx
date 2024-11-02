@@ -156,7 +156,7 @@ const Main = () => {
     const token = localStorage.getItem("token");
 
     api
-      .get("/api/schedule", {
+      .get("/api/mains/schedule", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

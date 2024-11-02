@@ -3,6 +3,14 @@ import styled from "styled-components";
 import axios from "axios";
 import MainContainer from "../components/MainContainer";
 
+// axios 인스턴스 생성
+const api = axios.create({
+  baseURL: "https://kyulimcho.shop",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 const LogoContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -145,9 +153,9 @@ const Main = () => {
     }
 
     // 예정된 러닝 정보.
-    const token = "Bearer token";
+    const token = localStorage.getItem("token");
 
-    axios
+    api
       .get("/api/schedule", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -161,6 +169,10 @@ const Main = () => {
         setDistrict(data.district);
         setSpeed(data.speed);
         setPathData(data.pathData);
+      })
+      .catch((error) => {
+        console.error("Error fetching running schedule:", error);
+        alert("러닝 정보를 불러오는 데 실패했습니다.");
       });
   }, []);
 

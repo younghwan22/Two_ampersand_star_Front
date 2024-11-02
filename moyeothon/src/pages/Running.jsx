@@ -3,6 +3,14 @@ import styled from "styled-components";
 import MainContainer from "../components/MainContainer";
 import axios from "axios";
 
+// axios 인스턴스 생성
+const api = axios.create({
+  baseURL: "https://kyulimcho.shop",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -80,21 +88,20 @@ const Button = styled.button`
 `;
 
 const Running = ({ routeId }) => {
-  const [data, setData] = useState(null); // data로 상태 이름 변경
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const token = "Bearer token";
 
   useEffect(() => {
     const fetchRunningData = async () => {
+      const token = localStorage.getItem("token");
       try {
-        const response = await axios.get(`/${routeId}`, {
+        const response = await api.get(`/api/running/${routeId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
           },
         });
-        setData(response.data); // 데이터 상태에 응답 데이터 설정
+        setData(response.data);
       } catch (err) {
         setError(err);
       } finally {
@@ -104,6 +111,25 @@ const Running = ({ routeId }) => {
 
     fetchRunningData();
   }, [routeId]);
+
+  const handleParticipation = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await api.post(
+        `/api/participate`,
+        { routeId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      alert("참여가 완료되었습니다!"); // 성공 메시지
+    } catch (err) {
+      alert("참여에 실패했습니다."); // 실패 메시지
+      console.error(err);
+    }
+  };
 
   if (loading) {
     return <Container>로딩중...</Container>;
@@ -132,7 +158,7 @@ const Running = ({ routeId }) => {
             <Badge>{speed}</Badge>
           </BadgeContainer>
         </RunningInfo>
-        <Button>참여하기</Button>
+        <Button onClick={handleParticipation}>참여하기</Button>
       </Container>
     </MainContainer>
   );

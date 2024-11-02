@@ -4,7 +4,7 @@ import axios from "axios";
 
 // axios 인스턴스 생성
 const api = axios.create({
-  baseURL: "http://3.38.168.166:8080",
+  baseURL: "https://kyulimcho.shop",
   headers: {
     "Content-Type": "application/json",
   },

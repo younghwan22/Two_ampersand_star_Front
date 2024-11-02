@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import MainContainer from "../components/MainContainer";
+import axios from "axios";
 
 const Container = styled.div`
   display: flex;
@@ -78,7 +79,42 @@ const Button = styled.button`
   }
 `;
 
-const Running = () => {
+const Running = ({ routeId }) => {
+  const [data, setData] = useState(null); // data로 상태 이름 변경
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const token = "Bearer token";
+
+  useEffect(() => {
+    const fetchRunningData = async () => {
+      try {
+        const response = await axios.get(`/${routeId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        setData(response.data); // 데이터 상태에 응답 데이터 설정
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRunningData();
+  }, [routeId]);
+
+  if (loading) {
+    return <Container>로딩중...</Container>;
+  }
+
+  if (error) {
+    return <Container>데이터를 가져올 수 없습니다.</Container>;
+  }
+
+  const { date, time, title, district, speed } = data;
+
   return (
     <MainContainer>
       <Title>러닝 정보</Title>
@@ -87,11 +123,13 @@ const Running = () => {
           <img src="../../img/ex_map.png" alt="지도" />
         </MapContainer>
         <RunningInfo>
-          <span>24.10.28 / 20:00</span>
-          <RunningTitle>중랑천 만보런</RunningTitle>
+          <span>
+            {date} / {time}
+          </span>
+          <RunningTitle>{title}</RunningTitle>
           <BadgeContainer>
-            <Badge>서울</Badge>
-            <Badge>빠르게</Badge>
+            <Badge>{district}</Badge>
+            <Badge>{speed}</Badge>
           </BadgeContainer>
         </RunningInfo>
         <Button>참여하기</Button>

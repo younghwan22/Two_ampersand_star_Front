@@ -148,7 +148,7 @@ function Signup() {
   // 회원가입 처리
   const handleSignup = async () => {
     try {
-      const response = await api.fetch("/api/auth/register", {
+      const response = await api.post("/api/auth/register", {
         email: formData.email,
         password: formData.password,
         passwordCheck: formData.passwordCheck,

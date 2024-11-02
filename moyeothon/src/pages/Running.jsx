@@ -96,7 +96,7 @@ const Running = ({ routeId }) => {
     const fetchRunningData = async () => {
       const token = localStorage.getItem("token");
       try {
-        const response = await api.get(`/api/running/${routeId}`, {
+        const response = await api.get(`/api/running/info/${routeId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -115,15 +115,11 @@ const Running = ({ routeId }) => {
   const handleParticipation = async () => {
     const token = localStorage.getItem("token");
     try {
-      const response = await api.post(
-        `/api/participate`,
-        { routeId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await api.post(`/api/running/info/${routeId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       alert("참여가 완료되었습니다!"); // 성공 메시지
     } catch (err) {
       alert("참여에 실패했습니다."); // 실패 메시지
